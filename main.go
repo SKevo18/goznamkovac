@@ -7,6 +7,8 @@ import (
 
 	"goznamkovac/internal/prevodnik"
 	"goznamkovac/internal/sablonovac"
+
+	"github.com/flosch/pongo2/v6"
 )
 
 const (
@@ -28,10 +30,13 @@ func konvertovatPoznamky(markdown_cesta string, html_vystup string) (chyba error
 		return chyba
 	}
 
-	html := sablonovac.VykreslitSablonu(poznamkySablona, sablonovac.Data{
-		"poznamky":     htmlPoznamky,
+	html, chyba := sablonovac.VykreslitSablonu(poznamkySablona, pongo2.Context{
+		"poznamky":     string(htmlPoznamky),
 		"pojmova_mapa": nil,
 	})
+	if chyba != nil {
+		return chyba
+	}
 
 	chyba = os.WriteFile(html_vystup, html, 0o644)
 	if chyba != nil {
@@ -41,11 +46,18 @@ func konvertovatPoznamky(markdown_cesta string, html_vystup string) (chyba error
 	return nil
 }
 
-func main() {
-	markdownPoznamky, _ := filepath.Glob(rootCesta + "/**/*.md")
+func najstMarkdownPoznamky() []string {
+	markdownPoznamky, _ := filepath.Glob(rootCesta + "/*.md")
 	if markdownPoznamky == nil {
-		log.Fatalf("Neboli nájdené žiadne markdown súbory v %s", rootCesta)
+		log.Fatalf("Neboli nájdené žiadne markdown súbory v `%s`.", rootCesta)
 	}
+
+	return markdownPoznamky
+}
+
+func main() {
+	markdownPoznamky := najstMarkdownPoznamky()
+	os.MkdirAll(vystupnaCesta, 0o755)
 
 	for _, markdown_poznamky := range markdownPoznamky {
 		html_vystup := vystupnaCesta + "/" + markdown_poznamky[len(rootCesta)+1:len(markdown_poznamky)-3] + ".html"

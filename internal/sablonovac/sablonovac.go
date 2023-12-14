@@ -1,23 +1,23 @@
 package sablonovac
 
 import (
-	"bytes"
 	"embed"
-	"html/template"
 	"log"
+
+	"github.com/flosch/pongo2/v6"
 )
 
 var (
-	//go:embed sablony
-	sablonyFS  embed.FS
-	sablonovac = template.Must(template.ParseFS(sablonyFS, "sablony/*.html"))
+	//go:embed sablony/*.html
+	sablonyFS embed.FS
+
+	// Globálny šablónovač, ktorý sa používa na načítanie šablón.
+	sablonovac = pongo2.NewSet("sablony", pongo2.NewFSLoader(sablonyFS))
 )
 
-type Data map[string]any
-
 // Načíta šablónu z daného súboru a vráti ju ako pointer na šablónu.
-func NacitatSablonu(cesta string) *template.Template {
-	sablona, chyba := sablonovac.ParseFiles(cesta)
+func NacitatSablonu(cesta string) *pongo2.Template {
+	sablona, chyba := sablonovac.FromFile(cesta)
 	if chyba != nil {
 		log.Fatalf("Nepodarilo sa načítať šablónu %s: %s", cesta, chyba)
 	}
@@ -25,15 +25,12 @@ func NacitatSablonu(cesta string) *template.Template {
 	return sablona
 }
 
-// Vykreslí danú šablónu s danými dátami a vráti výstup v bytoch.
-// V prípade chyby pri vykresľovaní šablóny sa program ukončí.
-func VykreslitSablonu(sablona *template.Template, data Data) []byte {
-	vystup := new(bytes.Buffer)
-
-	chyba := sablona.ExecuteTemplate(vystup, sablona.Name(), data)
+// Vykreslí danú šablónu s danými dátami a vráti výstup v bytoch, alebo chybu.
+func VykreslitSablonu(sablona *pongo2.Template, data pongo2.Context) ([]byte, error) {
+	vystup, chyba := sablona.ExecuteBytes(data)
 	if chyba != nil {
-		log.Fatalf("Nepodarilo sa vykresliť šablónu: %s", chyba)
+		return nil, chyba
 	}
 
-	return vystup.Bytes()
+	return vystup, nil
 }
