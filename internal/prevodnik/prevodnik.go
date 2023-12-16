@@ -2,7 +2,6 @@ package prevodnik
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -10,19 +9,33 @@ import (
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/yuin/goldmark"
-	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-var poznamkySablona = sablonovac.NacitatSablonu("sablony/_poznamky.html") // zoznamSablona   = sablonovac.NacitatSablonu("sablony/_zoznam.html")
+var poznamkySablona = sablonovac.NacitatSablonu("sablony/_poznamky.html")
 
-func markdownNaHTML(markdown_zdroj []byte) ([]byte, map[string]interface{}, error) {
+// zoznamSablona   = sablonovac.NacitatSablonu("sablony/_zoznam.html")
+
+type Poznamky struct {
+	nazov string
+	cesta string
+
+	prilozene_subory []string
+	datum_vytvorenia string
+}
+
+// Konvertuje poznámky z Markdown súboru do HTML
+func (poznamky Poznamky) MarkdownNaHTML() ([]byte, error) {
+	mdPoznamky, chyba := os.ReadFile(poznamky.cesta)
+	if chyba != nil {
+		return nil, chyba
+	}
+
 	prevodnik := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
-			meta.Meta,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -33,57 +46,71 @@ func markdownNaHTML(markdown_zdroj []byte) ([]byte, map[string]interface{}, erro
 	)
 
 	var buffer bytes.Buffer
-	context := parser.NewContext()
-	if chyba := prevodnik.Convert(markdown_zdroj, &buffer, parser.WithContext(context)); chyba != nil {
-		return nil, nil, chyba
+	if chyba := prevodnik.Convert(mdPoznamky, &buffer); chyba != nil {
+		return nil, chyba
 	}
-	metaData := meta.Get(context)
 
-	return buffer.Bytes(), metaData, nil
+	return buffer.Bytes(), nil
 }
 
-func konvertovatPoznamky(markdown_cesta string) ([]byte, map[string]interface{}, error) {
-	mdPoznamky, chyba := os.ReadFile(markdown_cesta)
+// Konvertuje poznámky z Markdown súboru do HTML a vykreslí ich do šablóny
+func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
+	htmlPoznamky, chyba := poznamky.MarkdownNaHTML()
 	if chyba != nil {
-		return nil, nil, chyba
-	}
-
-	htmlPoznamky, metaData, chyba := markdownNaHTML(mdPoznamky)
-	if chyba != nil {
-		return nil, nil, chyba
+		return nil, chyba
 	}
 
 	html, chyba := sablonovac.VykreslitSablonu(poznamkySablona, pongo2.Context{
-		"poznamky":     string(htmlPoznamky),
-		"meta":         metaData,
+		"html":         string(htmlPoznamky),
+		"poznamky":     poznamky,
 		"pojmova_mapa": nil,
 	})
 	if chyba != nil {
-		return nil, nil, chyba
+		return nil, chyba
 	}
 
-	return html, metaData, nil
+	return html, nil
 }
 
-type Poznamka struct {
-	nazov string
-	cesta string
+// Nájde všetky Markdown súbory pre poznámky (`poznamky.md`) v zadanom priečinku, rekurzívne
+func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
+	markdownPoznamky := make([]Poznamky, 0)
 
-	datum_vytvorenia string
-	autor            string
-}
+	chyba := filepath.Walk(poznamkyCesta, func(cesta string, info os.FileInfo, chyba error) error {
+		if chyba != nil {
+			return chyba
+		}
 
-func najstMarkdownPoznamky(poznamkyCesta string) ([]string, error) {
-	markdownPoznamky, _ := filepath.Glob(poznamkyCesta + "/*.md")
-	if markdownPoznamky == nil {
-		return nil, fmt.Errorf("neboli nájdené žiadne markdown súbory v `%s`", poznamkyCesta)
+		if info.IsDir() {
+			return nil
+		}
+
+		if filepath.Base(cesta) == "poznamky.md" {
+			root := filepath.Dir(cesta)
+			prilozene_subory, chyba := filepath.Glob(root + "/*")
+			if chyba != nil {
+				return chyba
+			}
+
+			markdownPoznamky = append(markdownPoznamky, Poznamky{
+				nazov:            filepath.Base(root),
+				cesta:            cesta,
+				prilozene_subory: prilozene_subory[1:],
+				datum_vytvorenia: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
+			})
+		}
+
+		return nil
+	})
+	if chyba != nil {
+		return nil, chyba
 	}
 
 	return markdownPoznamky, nil
 }
 
-func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Poznamka, error) {
-	var zoznamPoznamok []Poznamka
+func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Poznamky, error) {
+	var zoznamPoznamok []Poznamky
 	markdownPoznamky, chyba := najstMarkdownPoznamky(poznamkyCesta)
 	if chyba != nil {
 		return nil, chyba
@@ -91,47 +118,18 @@ func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Po
 
 	os.MkdirAll(vystupnaCesta+"/staticke", 0o755)
 
-	for _, markdown_poznamky := range markdownPoznamky {
-		html_cesta := filepath.Clean(vystupnaCesta + markdown_poznamky[len(poznamkyCesta):len(markdown_poznamky)-len(".md")] + ".html")
+	for _, poznamky := range markdownPoznamky {
+		vystupnaCesta := filepath.Clean(vystupnaCesta + poznamky.cesta[len(poznamkyCesta):len(poznamky.cesta)-len(".md")] + ".html")
 
-		html, metaData, chyba := konvertovatPoznamky(markdown_poznamky)
+		html, chyba := poznamky.KonvertovatPoznamky()
 		if chyba != nil {
 			return nil, chyba
 		}
 
-		os.MkdirAll(filepath.Dir(html_cesta), 0o755)
-		if chyba := os.WriteFile(html_cesta, html, 0o644); chyba != nil {
+		os.MkdirAll(filepath.Dir(vystupnaCesta), 0o755)
+		if chyba := os.WriteFile(vystupnaCesta, html, 0o644); chyba != nil {
 			return nil, chyba
 		}
-
-		var nazov string
-		if metaData["Nazov"] == nil {
-			nazov = filepath.Base(markdown_poznamky)
-		} else {
-			nazov = metaData["Nazov"].(string)
-		}
-
-		var datum_vytvorenia string
-		if metaData["Datum"] == nil {
-			stat, _ := os.Stat(markdown_poznamky)
-			datum_vytvorenia = stat.ModTime().Format("2006-01-02")
-		} else {
-			datum_vytvorenia = metaData["Datum"].(string)
-		}
-
-		var autor string
-		if metaData["Autor"] == nil {
-			autor = "Neznámy"
-		} else {
-			autor = metaData["Autor"].(string)
-		}
-
-		zoznamPoznamok = append(zoznamPoznamok, Poznamka{
-			nazov:            nazov,
-			cesta:            html_cesta,
-			datum_vytvorenia: datum_vytvorenia,
-			autor:            autor,
-		})
 	}
 
 	return zoznamPoznamok, nil

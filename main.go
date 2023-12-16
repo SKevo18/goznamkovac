@@ -30,10 +30,7 @@ func main() {
 				return chyba
 			}
 
-			chyba = sablonovac.KopirovatStatickeSubory(vystupnaCesta)
-			if chyba != nil {
-				return chyba
-			}
+			sablonovac.KopirovatStatickeSubory(vystupnaCesta)
 
 			/* // TODO: Upraviť šablónu
 			chyba = prevodnik.VytvoritZoznamPoznamok(vystupnaCesta+"/index.html", poznamkyZoznam)
