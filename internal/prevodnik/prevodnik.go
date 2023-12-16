@@ -2,6 +2,7 @@ package prevodnik
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 
@@ -60,10 +61,16 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 		return nil, chyba
 	}
 
+	pojmovaMapa := VytvoritPojmovuMapu(htmlPoznamky)
+	pojmovaMapaJSON, chyba := json.Marshal(pojmovaMapa)
+	if chyba != nil {
+		return nil, chyba
+	}
+
 	html, chyba := sablonovac.VykreslitSablonu(poznamkySablona, pongo2.Context{
 		"html":         string(htmlPoznamky),
 		"poznamky":     poznamky,
-		"pojmova_mapa": nil,
+		"pojmova_mapa": pojmovaMapaJSON,
 	})
 	if chyba != nil {
 		return nil, chyba
