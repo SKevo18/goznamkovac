@@ -1,86 +1,101 @@
 <!DOCTYPE html>
 <html lang="sk">
-<head>
+  <head>
     <title>Poznámkovač - {{ titulok|default:'Poznámkovač' }}</title>
 
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     {% block head_linky %}
-        <link rel="stylesheet" href="/staticke/styly.min.css"/>
+    <link rel="stylesheet" href="/staticke/tailwind.min.css" />
 
-        <script type="text/javascript">
-            function prepnutTmavyRezim(mode=null) {
-                const tmavyRezim = mode !== null ? mode : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-                const html = document.getElementsByTagName('html')[0];
-                
-                if (tmavyRezim) {
-                    html.classList = 'dark';
-                } else {
-                    html.classList = ''
-                }
+    <script type="text/javascript">
+      function prepnutTmavyRezim(mode = null) {
+        const tmavyRezim =
+          mode !== null
+            ? mode
+            : window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const html = document.getElementsByTagName("html")[0];
 
-                let link = document.createElement('link');
-                link.rel = "stylesheet";
-                link.crossOrigin = "anonymous";
-                link.referrerPolicy = "no-refferer";
+        if (tmavyRezim) {
+          html.classList = "dark";
+        } else {
+          html.classList = "";
+        }
 
-                link.href = `https://unpkg.com/github-markdown-css@latest/github-markdown-${tmavyRezim ? 'dark' : 'light'}.css`;
-                document.head.appendChild(link);
-            };
+        let link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.crossOrigin = "anonymous";
+        link.referrerPolicy = "no-refferer";
 
-            prepnutTmavyRezim();
-        </script>
+        link.href = `https://unpkg.com/github-markdown-css@latest/github-markdown-${
+          tmavyRezim ? "dark" : "light"
+        }.css`;
+        document.head.appendChild(link);
+      }
+
+      prepnutTmavyRezim();
+    </script>
     {% endblock head_linky %}
-</head>
+  </head>
 
-<body class="bg-gray-100 dark:bg-gray-800">
+  <body class="bg-gray-100 dark:bg-gray-800">
     <div class="flex flex-col min-h-screen">
-        <header class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
-            <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Poznámkovač</h1>
-            </div>
-        </header>
+      <header class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Poznámkovač
+          </h1>
+        </div>
+      </header>
 
-        <main class="flex-grow text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100">
-            <div class="mx-auto max-w-7xl">
-                {% block obsah %}{% endblock obsah %}
-            </div>
-        </main>
+      <main
+        class="flex-grow text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100"
+      >
+        <div class="mx-auto max-w-7xl">
+          {% block obsah %}{% endblock obsah %}
+        </div>
+      </main>
 
-        <footer class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
-            <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <p class="text-center text-gray-900 dark:text-gray-100">
-                    Poznámkovač je aplikácia s <a href="https://github.com/SKevo18/poznamkovac" class="font-bold text-blue-700 dark:text-blue-300 hover:underline">otvoreným zdrojovým kódom</a>.
-                </p>
-            </div>
-        </footer>
+      <footer class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <p class="text-center text-gray-900 dark:text-gray-100">
+            Poznámkovač je aplikácia s
+            <a
+              href="https://github.com/SKevo18/poznamkovac"
+              class="font-bold text-blue-700 dark:text-blue-300 hover:underline"
+              >otvoreným zdrojovým kódom</a
+            >.
+          </p>
+        </div>
+      </footer>
     </div>
 
     {% block skripty %}
-        <script type="text/javascript">
-            window.addEventListener('beforeprint', () => {
-                prepnutTmavyRezim(false);
-            });
+    <script type="text/javascript">
+      window.addEventListener("beforeprint", () => {
+        prepnutTmavyRezim(false);
+      });
 
-            window.addEventListener('afterprint', () => {
-                prepnutTmavyRezim();
-            });
+      window.addEventListener("afterprint", () => {
+        prepnutTmavyRezim();
+      });
 
-            document.addEventListener('DOMContentLoaded', function() {
-                var abbrElementy = document.querySelectorAll('abbr[title]');
+      document.addEventListener("DOMContentLoaded", function () {
+        var abbrElementy = document.querySelectorAll("abbr[title]");
 
-                abbrElementy.forEach(function(abbr) {
-                    abbr.addEventListener('touchstart', function(e) {
-                        e.preventDefault();
+        abbrElementy.forEach(function (abbr) {
+          abbr.addEventListener("touchstart", function (e) {
+            e.preventDefault();
 
-                        var titulok = this.getAttribute('title');
-                        alert(titulok);
-                    });
-                });
-            });
-        </script>
+            var titulok = this.getAttribute("title");
+            alert(titulok);
+          });
+        });
+      });
+    </script>
     {% endblock skripty %}
-</body>
+  </body>
 </html>

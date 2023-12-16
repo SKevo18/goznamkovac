@@ -1,5 +1,5 @@
 module.exports = {
-    content: ['../site/**/*.html'],
+    content: ['../internal/sablonovac/sablony/**/*'],
     darkMode: 'class',
     theme: {
       extend: {},

@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-npx tailwindcss -i ../internal/sablonovac/sablony/staticke/_tailwind.css -o ../site/staticke/styly.css
-npx cleancss ../site/staticke/styly.css -o ../site/staticke/styly.min.css
-rm ../site/staticke/styly.css
+npx tailwindcss -i tailwind.css -o ../internal/sablonovac/sablony/staticke/tailwind.css
+npx cleancss ../internal/sablonovac/sablony/staticke/tailwind.css -o ../internal/sablonovac/sablony/staticke/tailwind.min.css
+rm ../internal/sablonovac/sablony/staticke/tailwind.css

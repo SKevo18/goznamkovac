@@ -5,10 +5,11 @@ import (
 	"log"
 
 	"github.com/flosch/pongo2/v6"
+	"github.com/otiai10/copy"
 )
 
 var (
-	//go:embed sablony/*.html
+	//go:embed all:sablony
 	sablonyFS embed.FS
 
 	// Globálny šablónovač, ktorý sa používa na načítanie šablón.
@@ -33,4 +34,14 @@ func VykreslitSablonu(sablona *pongo2.Template, data pongo2.Context) ([]byte, er
 	}
 
 	return vystup, nil
+}
+
+// Skopíruje statické súbory do daného priečinku.
+func KopirovatStatickeSubory(cesta string) error {
+	chyba := copy.Copy("sablony/staticke", cesta + "/staticke", copy.Options{FS: sablonyFS})
+	if chyba != nil {
+		return chyba
+	}
+
+	return nil
 }
