@@ -14,7 +14,7 @@ import (
 const (
 	rootCesta     = "poznamky"
 	sablonaCesta  = "sablony"
-	vystupnaCesta = "vystup"
+	vystupnaCesta = "site"
 )
 
 var poznamkySablona = sablonovac.NacitatSablonu(sablonaCesta + "/_poznamky.html")
@@ -25,13 +25,14 @@ func konvertovatPoznamky(markdown_cesta string, html_vystup string) (chyba error
 		return chyba
 	}
 
-	htmlPoznamky, chyba := prevodnik.MarkdownNaHTML(mdPoznamky)
+	htmlPoznamky, metaData, chyba := prevodnik.MarkdownNaHTML(mdPoznamky)
 	if chyba != nil {
 		return chyba
 	}
 
 	html, chyba := sablonovac.VykreslitSablonu(poznamkySablona, pongo2.Context{
 		"poznamky":     string(htmlPoznamky),
+		"meta":         metaData,
 		"pojmova_mapa": nil,
 	})
 	if chyba != nil {
@@ -57,7 +58,7 @@ func najstMarkdownPoznamky() []string {
 
 func main() {
 	markdownPoznamky := najstMarkdownPoznamky()
-	os.MkdirAll(vystupnaCesta, 0o755)
+	os.MkdirAll(vystupnaCesta + "/staticke", 0o755)
 
 	for _, markdown_poznamky := range markdownPoznamky {
 		html_vystup := vystupnaCesta + "/" + markdown_poznamky[len(rootCesta)+1:len(markdown_poznamky)-3] + ".html"
