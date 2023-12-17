@@ -32,19 +32,18 @@ func main() {
 				vystupnaCesta = "./site"
 			}
 
-			_, chyba := prevodnik.KonvertovatVsetkyPoznamky(poznamkyCesta, vystupnaCesta)
+			os.RemoveAll(vystupnaCesta)
+			poznamkyZoznam, chyba := prevodnik.KonvertovatVsetkyPoznamky(poznamkyCesta, vystupnaCesta)
 			if chyba != nil {
 				return chyba
 			}
 
 			sablonovac.KopirovatStatickeSubory(vystupnaCesta)
 
-			/* // TODO: Upraviť šablónu
 			chyba = prevodnik.VytvoritZoznamPoznamok(vystupnaCesta+"/index.html", poznamkyZoznam)
 			if chyba != nil {
 				return chyba
 			}
-			*/
 
 			return nil
 		},

@@ -20,9 +20,10 @@ import (
 	"go.abhg.dev/goldmark/toc"
 )
 
-var poznamkySablona = sablonovac.NacitatSablonu("sablony/_poznamky.html")
-
-// zoznamSablona   = sablonovac.NacitatSablonu("sablony/_zoznam.html")
+var (
+	poznamkySablona = sablonovac.NacitatSablonu("sablony/_poznamky.html")
+	zoznamSablona   = sablonovac.NacitatSablonu("sablony/_zoznam.html")
+)
 
 // Konvertuje poznámky z Markdown súboru do HTML
 func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
@@ -56,16 +57,21 @@ func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
 }
 
 type Poznamky struct {
-	nazov string
-	cesta string
+	Nazov         string
+	MarkdownCesta string
 
-	prilozene_subory []string
-	datum_vytvorenia string
+	PrilozeneSubory []string
+	DatumVytvorenia string
+}
+
+// Vráti výstupnú cestu poznámok (t. j.: cesta mínus koreňový priečinok - priečinok poznámok sa vo výstupe nenachádza)
+func (poznamky Poznamky) VystupnaCesta() string {
+	return poznamky.MarkdownCesta[len(filepath.Base(poznamky.MarkdownCesta))+1:len(poznamky.MarkdownCesta)-len(".md")] + ".html"
 }
 
 // Konvertuje poznámky z Markdown súboru do HTML a vykreslí ich do šablóny
 func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
-	markdownPoznamky, chyba := os.ReadFile(poznamky.cesta)
+	markdownPoznamky, chyba := os.ReadFile(poznamky.MarkdownCesta)
 	if chyba != nil {
 		return nil, chyba
 	}
@@ -84,7 +90,7 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 		"html":         string(htmlPoznamky),
 		"poznamky":     poznamky,
 		"pojmova_mapa": string(pojmovaMapaJSON),
-		"staticke":     sablonovac.RelativnaCestaKStatickym(poznamky.cesta)[len("../"):], // mínus adresár zdroju poznámok, ktorý nie je zahrnutý vo výstupe
+		"staticke":     sablonovac.RelativnaCestaKStatickym(poznamky.VystupnaCesta()),
 	})
 	if chyba != nil {
 		return nil, chyba
@@ -93,7 +99,8 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 	return html, nil
 }
 
-// Nájde všetky Markdown súbory pre poznámky (`poznamky.md`) v zadanom priečinku, rekurzívne
+// Nájde všetky Markdown súbory pre poznámky (`index.md`) v zadanom priečinku, rekurzívne
+// (každý priečinok s poznámkami musí mať súbor `index.md` aby boli poznámky platné).
 func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 	markdownPoznamky := make([]Poznamky, 0)
 
@@ -106,7 +113,7 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 			return nil
 		}
 
-		if filepath.Base(cesta) == "poznamky.md" {
+		if filepath.Base(cesta) == "index.md" {
 			root := filepath.Dir(cesta)
 			prilozene_subory, chyba := filepath.Glob(root + "/*")
 			if chyba != nil {
@@ -114,10 +121,10 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 			}
 
 			markdownPoznamky = append(markdownPoznamky, Poznamky{
-				nazov:            filepath.Base(root),
-				cesta:            cesta,
-				prilozene_subory: prilozene_subory[1:],
-				datum_vytvorenia: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
+				Nazov:           filepath.Base(root),
+				MarkdownCesta:   cesta,
+				PrilozeneSubory: prilozene_subory[1:],
+				DatumVytvorenia: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
 			})
 		}
 
@@ -131,7 +138,6 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 }
 
 func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Poznamky, error) {
-	var zoznamPoznamok []Poznamky
 	markdownPoznamky, chyba := najstMarkdownPoznamky(poznamkyCesta)
 	if chyba != nil {
 		return nil, chyba
@@ -140,25 +146,26 @@ func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Po
 	os.MkdirAll(vystupnaCesta+"/staticke", 0o755)
 
 	for _, poznamky := range markdownPoznamky {
-		vystupnaCesta := filepath.Clean(vystupnaCesta + poznamky.cesta[len(poznamkyCesta):len(poznamky.cesta)-len(".md")] + ".html")
-
 		html, chyba := poznamky.KonvertovatPoznamky()
 		if chyba != nil {
 			return nil, chyba
 		}
 
-		os.MkdirAll(filepath.Dir(vystupnaCesta), 0o755)
-		if chyba := os.WriteFile(vystupnaCesta, html, 0o644); chyba != nil {
+		htmlCesta := vystupnaCesta + "/" + poznamky.VystupnaCesta()
+		os.MkdirAll(filepath.Dir(htmlCesta), 0o755)
+
+		if chyba := os.WriteFile(htmlCesta, html, 0o644); chyba != nil {
 			return nil, chyba
 		}
 	}
 
-	return zoznamPoznamok, nil
+	return markdownPoznamky, nil
 }
 
-/*func VytvoritZoznamPoznamok(cestaZoznamu string, zoznamPoznamok []Poznamka) error {
+func VytvoritZoznamPoznamok(cestaZoznamu string, zoznamPoznamok []Poznamky) error {
 	html, chyba := sablonovac.VykreslitSablonu(zoznamSablona, pongo2.Context{
-		"poznamky": zoznamPoznamok,
+		"zoznam_poznamok": zoznamPoznamok,
+		"staticke":        "staticke",
 	})
 	if chyba != nil {
 		return chyba
@@ -170,4 +177,3 @@ func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Po
 
 	return nil
 }
-*/
