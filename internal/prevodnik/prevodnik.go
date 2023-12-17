@@ -124,7 +124,7 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 				Nazov:           filepath.Base(root),
 				MarkdownCesta:   cesta,
 				PrilozeneSubory: prilozene_subory[1:],
-				DatumUpravy: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
+				DatumUpravy: info.ModTime().Format("2006-01-02 15:04:05"),
 			})
 		}
 
