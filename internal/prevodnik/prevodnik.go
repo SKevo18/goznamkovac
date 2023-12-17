@@ -14,6 +14,8 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 
+	pikchr "github.com/jchenry/goldmark-pikchr"
+	mathjax "github.com/litao91/goldmark-mathjax"
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/toc"
 )
@@ -33,12 +35,15 @@ func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
 				ListID:  "obsah-list",
 			},
 			&mermaid.Extender{},
+			&pikchr.Extender{DarkMode: true},
+			mathjax.MathJax,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
+			html.WithXHTML(),
 		),
 	)
 
