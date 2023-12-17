@@ -61,7 +61,7 @@ type Poznamky struct {
 	MarkdownCesta string
 
 	PrilozeneSubory []string
-	DatumVytvorenia string
+	DatumUpravy string
 }
 
 // Vráti výstupnú cestu poznámok (t. j.: cesta mínus koreňový priečinok - priečinok poznámok sa vo výstupe nenachádza)
@@ -124,7 +124,7 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 				Nazov:           filepath.Base(root),
 				MarkdownCesta:   cesta,
 				PrilozeneSubory: prilozene_subory[1:],
-				DatumVytvorenia: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
+				DatumUpravy: info.ModTime().Format("2006-01-02 15:04:05 +0100"),
 			})
 		}
 
