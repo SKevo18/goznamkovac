@@ -23,3 +23,11 @@ Lorem ipsum sit dolor amet ...
 Test
 
 In Germania, der Bier ist gut. In Italia, der vino ist gut. In Slovakia, der pivo ist gut.
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```

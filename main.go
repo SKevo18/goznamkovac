@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"poznamkovac/internal/prevodnik"
 	"poznamkovac/internal/sablonovac"
@@ -15,10 +17,15 @@ func main() {
 		Name:  "Poznámkovač",
 		Usage: "Aplikácia pre konvertovanie Markdown poznámok na statickú HTML stránku.",
 		Action: func(c *cli.Context) error {
+			wd, _ := os.Getwd()
+
 			poznamkyCesta := c.Args().First()
 			if poznamkyCesta == "" {
-				poznamkyCesta, _ = os.Getwd()
+				poznamkyCesta = wd
 			}
+
+			// FIXME: zlá cesta k statickým pre napr.: `../poznamkovac/poznamky`
+			poznamkyCesta = filepath.Clean(strings.TrimPrefix(poznamkyCesta, wd + string(os.PathSeparator)))
 
 			vystupnaCesta := c.Args().Get(1)
 			if vystupnaCesta == "" {

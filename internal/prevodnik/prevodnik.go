@@ -13,30 +13,26 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+
+	"go.abhg.dev/goldmark/mermaid"
+	"go.abhg.dev/goldmark/toc"
 )
 
 var poznamkySablona = sablonovac.NacitatSablonu("sablony/_poznamky.html")
 
 // zoznamSablona   = sablonovac.NacitatSablonu("sablony/_zoznam.html")
 
-type Poznamky struct {
-	nazov string
-	cesta string
-
-	prilozene_subory []string
-	datum_vytvorenia string
-}
-
 // Konvertuje poznámky z Markdown súboru do HTML
-func (poznamky Poznamky) MarkdownNaHTML() ([]byte, error) {
-	mdPoznamky, chyba := os.ReadFile(poznamky.cesta)
-	if chyba != nil {
-		return nil, chyba
-	}
-
+func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
 	prevodnik := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
+			&toc.Extender{
+				Title:   "Obsah",
+				TitleID: "obsah",
+				ListID:  "obsah-list",
+			},
+			&mermaid.Extender{},
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -47,22 +43,34 @@ func (poznamky Poznamky) MarkdownNaHTML() ([]byte, error) {
 	)
 
 	var buffer bytes.Buffer
-	if chyba := prevodnik.Convert(mdPoznamky, &buffer); chyba != nil {
+	if chyba := prevodnik.Convert(markdownPoznamky, &buffer); chyba != nil {
 		return nil, chyba
 	}
 
 	return buffer.Bytes(), nil
 }
 
+type Poznamky struct {
+	nazov string
+	cesta string
+
+	prilozene_subory []string
+	datum_vytvorenia string
+}
+
 // Konvertuje poznámky z Markdown súboru do HTML a vykreslí ich do šablóny
 func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
-	htmlPoznamky, chyba := poznamky.MarkdownNaHTML()
+	markdownPoznamky, chyba := os.ReadFile(poznamky.cesta)
 	if chyba != nil {
 		return nil, chyba
 	}
 
-	pojmovaMapa := VytvoritPojmovuMapu(htmlPoznamky)
-	pojmovaMapaJSON, chyba := json.Marshal(pojmovaMapa)
+	htmlPoznamky, chyba := MarkdownNaHTML(markdownPoznamky)
+	if chyba != nil {
+		return nil, chyba
+	}
+
+	pojmovaMapaJSON, chyba := json.Marshal(VytvoritPojmovuMapu(markdownPoznamky))
 	if chyba != nil {
 		return nil, chyba
 	}
@@ -70,7 +78,8 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 	html, chyba := sablonovac.VykreslitSablonu(poznamkySablona, pongo2.Context{
 		"html":         string(htmlPoznamky),
 		"poznamky":     poznamky,
-		"pojmova_mapa": pojmovaMapaJSON,
+		"pojmova_mapa": string(pojmovaMapaJSON),
+		"staticke":     sablonovac.RelativnaCestaKStatickym(poznamky.cesta)[len("../"):], // mínus adresár zdroju poznámok, ktorý nie je zahrnutý vo výstupe
 	})
 	if chyba != nil {
 		return nil, chyba

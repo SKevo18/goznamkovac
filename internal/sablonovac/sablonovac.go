@@ -3,6 +3,9 @@ package sablonovac
 import (
 	"embed"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/flosch/pongo2/v6"
 	"github.com/otiai10/copy"
@@ -15,6 +18,30 @@ var (
 	// Globálny šablónovač, ktorý sa používa na načítanie šablón.
 	sablonovac = pongo2.NewSet("sablony", pongo2.NewFSLoader(sablonyFS))
 )
+
+const PathSeparatorStr = string(os.PathSeparator)
+
+// Vráti cestu ako zoznam adresárov, napr.: `sablony/_poznamky.html` -> `["sablony", "_poznamky.html"]`
+func CestaAkoZoznam(cesta string) []string {
+	return strings.Split(cesta, PathSeparatorStr)
+}
+
+// Vráti cestu k statickému priečinku (v koreňovom priečinku) z relatívnej cesty.
+// Napr.: ak je cesta `/site/2023/12/17/ucivo/subor.md`, vráti `../../../../../staticke`.
+func RelativnaCestaKStatickym(odRelativnejCesty string) string {
+	cesta := ""
+
+	dir := strings.TrimPrefix(filepath.Dir(odRelativnejCesty), PathSeparatorStr)
+	if dir == "." {
+		return "staticke"
+	}
+
+	for i := 0; i < len(CestaAkoZoznam(dir)); i++ {
+		cesta += "../"
+	}
+
+	return cesta + "staticke"
+}
 
 // Načíta šablónu z daného súboru a vráti ju ako pointer na šablónu.
 func NacitatSablonu(cesta string) *pongo2.Template {
@@ -38,7 +65,7 @@ func VykreslitSablonu(sablona *pongo2.Template, data pongo2.Context) ([]byte, er
 
 // Skopíruje statické súbory do daného priečinku.
 func KopirovatStatickeSubory(cesta string) error {
-	chyba := copy.Copy("sablony/staticke", cesta + "/staticke", copy.Options{FS: sablonyFS})
+	chyba := copy.Copy("sablony/staticke", cesta+"/staticke", copy.Options{FS: sablonyFS})
 	if chyba != nil {
 		return chyba
 	}

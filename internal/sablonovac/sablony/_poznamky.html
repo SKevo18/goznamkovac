@@ -37,27 +37,15 @@
 
 {% if pojmova_mapa %}
 <!-- Načítanie pojmovej mapy -->
-<script type="text/javascript" src="/staticke/pojmova_mapa.js"></script>
+<script type="text/javascript" src="{{ staticke }}/pojmova_mapa.js"></script>
 <script type="text/javascript">
   const DATA = {{ pojmova_mapa|safe }}; // eslint-disable-line
   vytvoritPojmovuMapu(DATA);
 </script>
 {% endif %}
 
-<!-- Načítanie D3.js a Mermaid -->
-<script type="text/javascript" src="https://unpkg.com/d3@7"></script>
-<script type="module">
-  import mermaid from "https://unpkg.com/mermaid@10/dist/mermaid.esm.min.mjs";
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: "neutral",
-    logLevel: "debug",
-  });
-
-  window.mermaid = mermaid;
-</script>
-
 <!-- Približovanie Mermaid diagramov pomocou D3.js -->
+<script type="text/javascript" src="https://unpkg.com/d3@7"></script>
 <script type="text/javascript">
   var observer = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {
@@ -84,25 +72,5 @@
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
-</script>
-
-<!-- MathJax -->
-<script
-  type="text/javascript"
-  src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"
-></script>
-<script type="text/javascript">
-  window.MathJax = {
-    tex: {
-      inlineMath: [["\\(", "\\)"]],
-      displayMath: [["\\[", "\\]"]],
-      processEscapes: true,
-      processEnvironments: true,
-    },
-    options: {
-      ignoreHtmlClass: ".*",
-      processHtmlClass: "arithmatex",
-    },
-  };
 </script>
 {% endblock skripty %}
