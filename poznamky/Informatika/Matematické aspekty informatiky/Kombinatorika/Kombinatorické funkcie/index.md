@@ -23,29 +23,5 @@ $$
 Kombinačné číslo, označované ako `C(n, k)` alebo `n` nad `k`, predstavuje počet možností, ako vybrať `k` prvkov z `n` prvkov bez ohľadu na poradie. Vypočíta sa podľa vzorca:
 
 $$
-C(n, k) = \frac{n!}{k!(n-k)!}
+\binom nk = C(n, k) = \frac{n!}{(n - k)! \times k!}
 $$
-
-## Grafické znázornenie kombinatorických funkcií
-
-### Graf permutácií
-
-```mermaid
-graph LR
-    A[N prvkov] -->|Permutácie| B[n! možností]
-```
-
-### Graf variácií
-
-```pikchr
-arrow right 200 from "n prvkov Variácie"
-box same "V(n, k)"
-arrow right 200 "k-prvkové usporiadania"
-```
-
-### Graf kombinácií
-
-```mermaid
-graph TD
-    A[N prvkov] -->|Kombinácie| B[C(n, k) možností]
-```
