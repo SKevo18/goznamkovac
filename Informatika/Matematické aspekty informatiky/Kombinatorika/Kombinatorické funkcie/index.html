@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="sk">
+  <head>
+    <title>Poznámkovač - Poznámkovač</title>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+    <link rel="stylesheet" href="../../../../staticke/tailwind.min.css" />
+
+    <script type="text/javascript">
+      function prepnutTmavyRezim(mode = null) {
+        const tmavyRezim =
+          mode !== null
+            ? mode
+            : window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const html = document.getElementsByTagName("html")[0];
+
+        if (tmavyRezim) {
+          html.classList = "dark";
+        } else {
+          html.classList = "";
+        }
+
+        let link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.crossOrigin = "anonymous";
+        link.referrerPolicy = "no-refferer";
+
+        link.href = `https://unpkg.com/github-markdown-css@latest/github-markdown-${
+          tmavyRezim ? "dark" : "light"
+        }.css`;
+        document.head.appendChild(link);
+      }
+
+      prepnutTmavyRezim();
+    </script>
+    
+  </head>
+
+  <body class="bg-gray-100 dark:bg-gray-800">
+    <div class="flex flex-col min-h-screen">
+      <header class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Poznámkovač
+          </h1>
+        </div>
+      </header>
+
+      <main
+        class="flex-grow text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100"
+      >
+        <div class="mx-auto max-w-7xl">
+           
+<div id="pojmova_mapa" class="print:hidden" style="height: 65vh"></div>
+
+
+<article class="p-4 markdown-body md:p-8" style="background-color: transparent">
+  <h1 id="obsah">Obsah</h1>
+<ul id="obsah-list">
+<li>
+<a href="#kombinatorika">Kombinatorika</a><ul>
+<li>
+<a href="#kombinatorick-funkcie">Kombinatorické funkcie</a><ul>
+<li>
+<a href="#permutcie">Permutácie</a></li>
+<li>
+<a href="#varicie">Variácie</a></li>
+<li>
+<a href="#kombinan-sla">Kombinačné čísla</a></li>
+</ul>
+</li>
+<li>
+<a href="#grafick-znzornenie-kombinatorickch-funkci">Grafické znázornenie kombinatorických funkcií</a><ul>
+<li>
+<a href="#graf-permutci">Graf permutácií</a></li>
+<li>
+<a href="#graf-varici">Graf variácií</a></li>
+<li>
+<a href="#graf-kombinci">Graf kombinácií</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="kombinatorika">Kombinatorika</h1>
+<h2 id="kombinatorick-funkcie">Kombinatorické funkcie</h2>
+<h3 id="permutcie">Permutácie</h3>
+<p>Permutácia je usporiadanie množiny prvkov do určitého poradia. Počet všetkých permutácií množiny s <code>n</code> prvkami je <code>n!</code> (n-faktoriál).</p>
+<p><span class="math display">\[P(n) = n!
+\]</span></p>
+<h3 id="varicie">Variácie</h3>
+<p>Variácie sú usporiadané výbery prvkov z danej množiny. Počet variácií <code>k</code> prvkov z množiny <code>n</code> prvkov je daný vzorcom:</p>
+<p><span class="math display">\[V(n, k) = \frac{n!}{(n-k)!}
+\]</span></p>
+<h3 id="kombinan-sla">Kombinačné čísla</h3>
+<p>Kombinačné číslo, označované ako <code>C(n, k)</code> alebo <code>n</code> nad <code>k</code>, predstavuje počet možností, ako vybrať <code>k</code> prvkov z <code>n</code> prvkov bez ohľadu na poradie. Vypočíta sa podľa vzorca:</p>
+<p><span class="math display">\[C(n, k) = \frac{n!}{k!(n-k)!}
+\]</span></p>
+<h2 id="grafick-znzornenie-kombinatorickch-funkci">Grafické znázornenie kombinatorických funkcií</h2>
+<h3 id="graf-permutci">Graf permutácií</h3>
+<pre class="mermaid">graph LR
+    A[N prvkov] --&gt;|Permutácie| B[n! možností]
+</pre><h3 id="graf-varici">Graf variácií</h3>
+<div class="pikchr-svg" style="max-width:-1px"><div><pre>
+/*    1 */  arrow right 200 from "n prvkov Variácie"
+                                ^^^^^^^^^^^^^^^^^^^^
+ERROR: syntax error
+</pre></div>
+</div><h3 id="graf-kombinci">Graf kombinácií</h3>
+<pre class="mermaid">graph TD
+    A[N prvkov] --&gt;|Kombinácie| B[C(n, k) možností]
+</pre><script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script><script>mermaid.initialize({startOnLoad: true});</script>
+</article>
+
+        </div>
+      </main>
+
+      <footer class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <p class="text-center text-gray-900 dark:text-gray-100">
+            Poznámkovač je aplikácia s
+            <a
+              href="https://github.com/SKevo18/poznamkovac"
+              class="font-bold text-blue-700 dark:text-blue-300 hover:underline"
+              >otvoreným zdrojovým kódom</a
+            >.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+     
+
+<!-- vis-network -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/vis-network@9/dist/dist/vis-network.min.css"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+/>
+<script
+  type="text/javascript"
+  src="https://unpkg.com/vis-network@9/dist/vis-network.min.js"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+
+<!-- Tooltipy -->
+<script
+  type="text/javascript"
+  src="https://unpkg.com/@popperjs/core@2"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+<script
+  type="text/javascript"
+  src="https://unpkg.com/tippy.js@6"
+  crossorigin="anonymous"
+  referrerpolicy="no-referrer"
+></script>
+
+
+<!-- Načítanie pojmovej mapy -->
+<script type="text/javascript" src="../../../../staticke/pojmova_mapa.js"></script>
+<script type="text/javascript">
+  const DATA = {"bunky":[{"id":0,"label":"Kombinatorika","level":1,"color":"#e6e463"},{"id":1,"label":"Kombinatorické funkcie","level":2,"color":"#dee27c"},{"id":2,"label":"Permutácie","level":3,"color":"#e161a0"},{"id":3,"label":"Variácie","level":3,"color":"#fce3e1"},{"id":4,"label":"Kombinačné čísla","level":3,"color":"#c9aaff"},{"id":5,"label":"Grafické znázornenie kombinatorických funkcií","level":2,"color":"#f6ee77"},{"id":6,"label":"Graf permutácií","level":3,"color":"#5ba551"},{"id":7,"label":"Graf variácií","level":3,"color":"#b65af6"},{"id":8,"label":"Graf kombinácií","level":3,"color":"#e1ffff"}],"spojenia":[{"from":0,"to":1},{"from":1,"to":2},{"from":1,"to":3},{"from":1,"to":4},{"from":0,"to":5},{"from":5,"to":6},{"from":5,"to":7},{"from":5,"to":8}],"tooltipy":[{"id":2,"content":"\u003cp\u003ePermutácia je usporiadanie množiny prvkov do určitého poradia. Počet všetkých permutácií množiny s \u003ccode\u003en\u003c/code\u003e prvkami je \u003ccode\u003en!\u003c/code\u003e (n-faktoriál).\u003c/p\u003e\n\u003cp\u003e\u003cspan class=\"math display\"\u003e\\[P(n) = n!\n\\]\u003c/span\u003e\u003c/p\u003e\n"},{"id":3,"content":"\u003cp\u003eVariácie sú usporiadané výbery prvkov z danej množiny. Počet variácií \u003ccode\u003ek\u003c/code\u003e prvkov z množiny \u003ccode\u003en\u003c/code\u003e prvkov je daný vzorcom:\u003c/p\u003e\n\u003cp\u003e\u003cspan class=\"math display\"\u003e\\[V(n, k) = \\frac{n!}{(n-k)!}\n\\]\u003c/span\u003e\u003c/p\u003e\n"},{"id":4,"content":"\u003cp\u003eKombinačné číslo, označované ako \u003ccode\u003eC(n, k)\u003c/code\u003e alebo \u003ccode\u003en\u003c/code\u003e nad \u003ccode\u003ek\u003c/code\u003e, predstavuje počet možností, ako vybrať \u003ccode\u003ek\u003c/code\u003e prvkov z \u003ccode\u003en\u003c/code\u003e prvkov bez ohľadu na poradie. Vypočíta sa podľa vzorca:\u003c/p\u003e\n\u003cp\u003e\u003cspan class=\"math display\"\u003e\\[C(n, k) = \\frac{n!}{k!(n-k)!}\n\\]\u003c/span\u003e\u003c/p\u003e\n"},{"id":6,"content":"\u003cpre class=\"mermaid\"\u003egraph LR\n    A[N prvkov] --\u0026gt;|Permutácie| B[n! možností]\n\u003c/pre\u003e\u003cscript src=\"https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js\"\u003e\u003c/script\u003e\u003cscript\u003emermaid.initialize({startOnLoad: true});\u003c/script\u003e"},{"id":7,"content":"\u003cdiv class=\"pikchr-svg\" style=\"max-width:-1px\"\u003e\u003cdiv\u003e\u003cpre\u003e\n/*    1 */  arrow right 200 from \"n prvkov Variácie\"\n                                ^^^^^^^^^^^^^^^^^^^^\nERROR: syntax error\n\u003c/pre\u003e\u003c/div\u003e\n\u003c/div\u003e"},{"id":8,"content":"\u003cpre class=\"mermaid\"\u003egraph TD\n    A[N prvkov] --\u0026gt;|Kombinácie| B[C(n, k) možností]\n\u003c/pre\u003e\u003cscript src=\"https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js\"\u003e\u003c/script\u003e\u003cscript\u003emermaid.initialize({startOnLoad: true});\u003c/script\u003e"}]}; // eslint-disable-line
+  vytvoritPojmovuMapu(DATA);
+</script>
+
+
+<!-- Približovanie Mermaid diagramov pomocou D3.js -->
+<script type="text/javascript" src="https://unpkg.com/d3@7"></script>
+<script type="text/javascript">
+  var observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.addedNodes.length) {
+        var addedNode = mutation.addedNodes[0];
+
+        if (
+          addedNode &&
+          addedNode.nodeName === "svg" &&
+          addedNode.parentNode.classList.contains("mermaid")
+        ) {
+          var svg = d3.select(addedNode);
+          svg.html(`<g>${svg.html()}</g>`);
+          var vnutro = svg.select("g");
+
+          var priblizenie = d3.zoom().on("zoom", (event) => {
+            vnutro.attr("transform", event.transform);
+          });
+
+          svg.call(priblizenie);
+        }
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  </body>
+</html>

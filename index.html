@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="sk">
+  <head>
+    <title>Poznámkovač - Poznámkovač</title>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+    <link rel="stylesheet" href="staticke/tailwind.min.css" />
+
+    <script type="text/javascript">
+      function prepnutTmavyRezim(mode = null) {
+        const tmavyRezim =
+          mode !== null
+            ? mode
+            : window.matchMedia &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const html = document.getElementsByTagName("html")[0];
+
+        if (tmavyRezim) {
+          html.classList = "dark";
+        } else {
+          html.classList = "";
+        }
+
+        let link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.crossOrigin = "anonymous";
+        link.referrerPolicy = "no-refferer";
+
+        link.href = `https://unpkg.com/github-markdown-css@latest/github-markdown-${
+          tmavyRezim ? "dark" : "light"
+        }.css`;
+        document.head.appendChild(link);
+      }
+
+      prepnutTmavyRezim();
+    </script>
+    
+  </head>
+
+  <body class="bg-gray-100 dark:bg-gray-800">
+    <div class="flex flex-col min-h-screen">
+      <header class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Poznámkovač
+          </h1>
+        </div>
+      </header>
+
+      <main
+        class="flex-grow text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-100"
+      >
+        <div class="mx-auto max-w-7xl">
+          
+<div class="flex-grow p-5 text-gray-900 bg-gray-200 dark:bg-gray-900 dark:text-gray-100">
+  <h1 class="mb-4 text-3xl font-bold">Zoznam poznámok</h1>
+  <ul class="space-y-4">
+    
+    <li>
+      <a href="Informatika/Matematické aspekty informatiky/Kombinatorika/Kombinatorické funkcie/index.html" class="text-blue-500 hover:underline">
+        Kombinatorické funkcie
+      </a>
+      <p class="text-sm text-gray-500">
+        Vytvorené: 2023-12-17 19:36:15 +1200
+      </p>
+      <ul class="pl-5 list-disc">
+        
+      </ul>
+    </li>
+    
+  </ul>
+</div>
+
+        </div>
+      </main>
+
+      <footer class="bg-gray-100 shadow dark:bg-gray-800 print:hidden">
+        <div class="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <p class="text-center text-gray-900 dark:text-gray-100">
+            Poznámkovač je aplikácia s
+            <a
+              href="https://github.com/SKevo18/poznamkovac"
+              class="font-bold text-blue-700 dark:text-blue-300 hover:underline"
+              >otvoreným zdrojovým kódom</a
+            >.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    
+    <script type="text/javascript">
+      window.addEventListener("beforeprint", () => {
+        prepnutTmavyRezim(false);
+      });
+
+      window.addEventListener("afterprint", () => {
+        prepnutTmavyRezim();
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var abbrElementy = document.querySelectorAll("abbr[title]");
+
+        abbrElementy.forEach(function (abbr) {
+          abbr.addEventListener("touchstart", function (e) {
+            e.preventDefault();
+
+            var titulok = this.getAttribute("title");
+            alert(titulok);
+          });
+        });
+      });
+    </script>
+    
+  </body>
+</html>
