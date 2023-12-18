@@ -25,6 +25,7 @@ require (
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/otiai10/copy v1.14.0
 	github.com/urfave/cli/v2 v2.26.0
+	go.abhg.dev/goldmark/anchor v0.1.1
 	go.abhg.dev/goldmark/mermaid v0.5.0
 	go.abhg.dev/goldmark/toc v0.9.0
 )

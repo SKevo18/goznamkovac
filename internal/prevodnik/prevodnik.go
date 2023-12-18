@@ -16,6 +16,7 @@ import (
 
 	pikchr "github.com/jchenry/goldmark-pikchr"
 	mathjax "github.com/litao91/goldmark-mathjax"
+	"go.abhg.dev/goldmark/anchor"
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/toc"
 )
@@ -30,6 +31,14 @@ func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
 	prevodnik := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
+			extension.Footnote,
+			extension.DefinitionList,
+			extension.Typographer,
+
+			mathjax.MathJax,
+			&anchor.Extender{
+				Position: anchor.Before,
+			},
 			&toc.Extender{
 				Title:   "Obsah",
 				TitleID: "obsah",
@@ -37,7 +46,6 @@ func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
 			},
 			&mermaid.Extender{},
 			&pikchr.Extender{DarkMode: true},
-			mathjax.MathJax,
 		),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
@@ -61,7 +69,7 @@ type Poznamky struct {
 	MarkdownCesta string
 
 	PrilozeneSubory []string
-	DatumUpravy string
+	DatumUpravy     string
 }
 
 // Vráti výstupnú cestu poznámok (t. j.: cesta mínus koreňový priečinok - priečinok poznámok sa vo výstupe nenachádza)
@@ -124,7 +132,7 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 				Nazov:           filepath.Base(root),
 				MarkdownCesta:   cesta,
 				PrilozeneSubory: prilozene_subory[1:],
-				DatumUpravy: info.ModTime().Format("2006-01-02 15:04:05"),
+				DatumUpravy:     info.ModTime().Format("2006-01-02 15:04:05"),
 			})
 		}
 
