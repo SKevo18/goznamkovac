@@ -65,7 +65,11 @@ func VykreslitSablonu(sablona *pongo2.Template, data pongo2.Context) ([]byte, er
 
 // Skopíruje statické súbory do daného priečinku.
 func KopirovatStatickeSubory(cesta string) error {
-	chyba := copy.Copy("sablony/staticke", cesta+"/staticke", copy.Options{FS: sablonyFS})
+	chyba := copy.Copy("sablony/staticke", cesta+"/staticke", copy.Options{
+		FS:                sablonyFS,
+		PermissionControl: copy.AddPermission(0o755),
+	})
+
 	if chyba != nil {
 		return chyba
 	}

@@ -223,6 +223,14 @@ $$
 
 Podobné kombináciám bez opakovania, ale teraz sa písmená môžu opakovať: `AA`, `BB`.
 
+##### Abc
+
+bla bla
+
+###### Def
+
+aaaa
+
 ## Slovné úlohy na kombinatoriku
 
 Predstavme si úlohy, ako napríklad:

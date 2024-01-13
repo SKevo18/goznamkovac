@@ -32,7 +32,11 @@ func main() {
 				vystupnaCesta = "./site"
 			}
 
-			os.RemoveAll(vystupnaCesta)
+			chyba := os.RemoveAll(vystupnaCesta)
+			if chyba != nil {
+				return chyba
+			}
+
 			poznamkyZoznam, chyba := prevodnik.KonvertovatVsetkyPoznamky(poznamkyCesta, vystupnaCesta)
 			if chyba != nil {
 				return chyba

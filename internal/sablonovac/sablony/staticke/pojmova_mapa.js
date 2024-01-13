@@ -5,7 +5,9 @@
  * @returns {object} JSON reprezentácia pojmovej mapy.
  **/
 function vytvoritDataMapy(poznamkyElement) {
-    const nadpisy = poznamkyElement.querySelectorAll("h1:not(#obsah), h2, h3, h4, h5, h6");
+    const nadpisy = poznamkyElement.querySelectorAll(
+        "h1:not(#obsah), h2, h3, h4, h5, h6"
+    );
     let mapa = { vrcholy: [], hrany: [] };
 
     // Zoznam, ktorý uchováva posledný nadpis na každej úrovni
@@ -17,14 +19,18 @@ function vytvoritDataMapy(poznamkyElement) {
 
         const idVrchola = i + 1;
         const nazov = nadpis.innerText.slice(2);
-        mapa.vrcholy.push({ id: idVrchola, label: nazov });
+
+        const idRodica = poslednyNadpisNaUrovni[aktualnyLevel - 1] || 1;
+        mapa.vrcholy.push({
+            id: idVrchola,
+            label: nazov,
+            color: generovatFarbu(idRodica + aktualnyLevel),
+        });
 
         if (aktualnyLevel > 1) {
-            const idRodicovskehoVrchola = poslednyNadpisNaUrovni[aktualnyLevel - 1] || 1;
-
             mapa.hrany.push({
-                from: idRodicovskehoVrchola,
-                to: idVrchola
+                from: idRodica,
+                to: idVrchola,
             });
         }
 
@@ -32,14 +38,17 @@ function vytvoritDataMapy(poznamkyElement) {
         poslednyNadpisNaUrovni[aktualnyLevel] = idVrchola;
 
         // Vymažte všetky nadpisy na vyšších úrovniach
-        for (let j = aktualnyLevel + 1; j < poslednyNadpisNaUrovni.length; j++) {
+        for (
+            let j = aktualnyLevel + 1;
+            j < poslednyNadpisNaUrovni.length;
+            j++
+        ) {
             delete poslednyNadpisNaUrovni[j];
         }
     }
 
     return mapa;
 }
-
 
 /**
  * Vytvorí JSON pojmovej mapy z obsahu stránky.
@@ -97,17 +106,6 @@ function vykreslitMapu(elementMapy, jsonMapy) {
     return pojmova_mapa;
 }
 
-window.addEventListener("load", function () {
-    const poznamkyElement = document.getElementById("poznamky");
-    const elementMapy = document.getElementById("pojmovaMapa");
-
-    if (poznamkyElement == null || elementMapy == null) return;
-
-    const jsonMapy = vytvoritDataMapy(poznamkyElement);
-    vykreslitMapu(elementMapy, jsonMapy);
-});
-
-
 /**
  * Získajte úroveň nadpisu (h1, h2, atď.).
  *
@@ -116,4 +114,15 @@ window.addEventListener("load", function () {
  **/
 function ziskatLevelNadpisu(nadpis) {
     return parseInt(nadpis.tagName.substring(1), 10);
+}
+
+/**
+ * Generuje náhodnú farbu z čísla. Rovnaké číslo vždy vygeneruje rovnakú farbu.
+ *
+ * @param {number} cislo Číslo, z ktorého sa generuje farba.
+ * @returns {string} Farba v hexadecimálnom formáte.
+ **/
+function generovatFarbu(cislo) {
+    const farba = Math.floor(cislo * (255 - 6));
+    return "#" + farba.toString(16).slice(0, 6);
 }

@@ -45,6 +45,13 @@
 
 <!-- Načítanie pojmovej mapy -->
 <script type="text/javascript" src="{{ staticke }}/pojmova_mapa.js"></script>
+<script>
+    const poznamkyElement = document.getElementById("poznamky");
+    const elementMapy = document.getElementById("pojmovaMapa");
+
+    const jsonMapy = vytvoritDataMapy(poznamkyElement);
+    vykreslitMapu(elementMapy, jsonMapy);
+</script>
 {% endif %}
 
 <!-- Približovanie Mermaid diagramov pomocou D3.js -->
