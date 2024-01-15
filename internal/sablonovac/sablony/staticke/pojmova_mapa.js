@@ -24,7 +24,7 @@ function vytvoritDataMapy(poznamkyElement) {
         mapa.vrcholy.push({
             id: idVrchola,
             label: nazov,
-            color: generovatFarbu(idRodica + aktualnyLevel),
+            color: generovatFarbu(idRodica * aktualnyLevel),
         });
 
         if (aktualnyLevel > 1) {
@@ -68,6 +68,11 @@ function vykreslitMapu(elementMapy, jsonMapy) {
     const nastavenia = {
         interaction: {
             hover: true,
+            keyboard: {
+                enabled: true,
+                bindToWindow: false,
+                autoFocus: false
+            }
         },
         nodes: {
             shape: "box",
@@ -80,9 +85,9 @@ function vykreslitMapu(elementMapy, jsonMapy) {
         edges: {
             smooth: {
                 type: "dynamic",
-                roundness: 1.0,
+                roundness: 0.5,
             },
-            width: 0.15,
+            width: 0.75,
             arrows: {
                 to: {
                     enabled: true,
@@ -96,6 +101,7 @@ function vykreslitMapu(elementMapy, jsonMapy) {
                 sortMethod: "directed",
                 nodeSpacing: jeSirokeZobrazenie ? 220 : 100,
                 levelSeparation: jeSirokeZobrazenie ? 100 : 250,
+                shakeTowards: "roots",
             },
         },
         physics: false,
@@ -117,12 +123,43 @@ function ziskatLevelNadpisu(nadpis) {
 }
 
 /**
+ * Generuje náhodné číslo z čísla (seed). Rovnaký seed vždy vygeneruje rovnaké "náhodné" číslo v určenom rozsahu.
+ *
+ * https://stackoverflow.com/a/63599906
+ * 
+ * @param {number} seed Číslo, z ktorého sa generuje náhodné číslo.
+ * @param {number[]} rozsah Rozsah, v ktorom sa náhodné číslo generuje.
+ * @returns {number} Náhodné číslo.
+ **/
+function nahodneCislo(seed, rozsah = [0, 255]) {
+    seed = String(seed)
+        .split("")
+        .reduce((c, n) => (n != 0 ? c * n : c * c));
+
+    let od = rozsah[0];
+    let po = rozsah[1];
+
+    while (seed < rozsah[0] || seed > rozsah[1]) {
+        if (seed > rozsah[1]) seed = Math.floor(seed / po--);
+        if (seed < rozsah[0]) seed = Math.floor(seed * od++);
+    }
+
+    return seed;
+}
+
+/**
  * Generuje náhodnú farbu z čísla. Rovnaké číslo vždy vygeneruje rovnakú farbu.
  *
  * @param {number} cislo Číslo, z ktorého sa generuje farba.
- * @returns {string} Farba v hexadecimálnom formáte.
+ * @returns {string} Farba v RBG formáte.
  **/
-function generovatFarbu(cislo) {
-    const farba = Math.floor(cislo * (255 - 6));
-    return "#" + farba.toString(16).slice(0, 6);
+function generovatFarbu(seed=1, svetla=true) {
+    let od = svetla ? 125 : 0
+    let po = svetla ? 255 : 125
+  
+    r = nahodneCislo(seed + 11, [od, po])
+    g = nahodneCislo(seed + 12, [od, po])
+    b = nahodneCislo(seed + 13, [od, po])
+
+    return `rgb(${r}, ${g}, ${b})`;
 }
