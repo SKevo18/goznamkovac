@@ -4,17 +4,12 @@
 
 <article
     id="poznamky"
-    class="p-4 markdown-body md:p-8"
+    class="px-[5vw] py-8 markdown-body md:p-8"
     style="background-color: transparent"
 >
     {{ html|safe }}
 </article>
-{% endblock obsah %}
-
-{% block skripty %}
-{{ super() }}
-
-{% if zobrazitPojmovuMapu%}
+{% endblock obsah %} {% block skripty %} {{ super() }} {% if zobrazitPojmovuMapu%}
 <!-- vis-network -->
 <link
     rel="stylesheet"
