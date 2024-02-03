@@ -2,12 +2,11 @@ class Kviz {
     constructor(element = document.getElementById("kviz")) {
         this.element = element;
         this.otazky = this._vsetkyOtazky();
-        this.odpovede = {};
         this.aktualnaOtazka = 0;
     }
 
     _vsetkyOtazky() {
-        const otazky = this.element.querySelectorAll(".otazka");
+        const otazky = this.element.querySelectorAll("[data-otazka]");
         if (otazky.length === 0) {
             throw new Error("Kvíz nemá žiadne elementy pre panely otázok.");
         }
@@ -15,21 +14,27 @@ class Kviz {
         return otazky;
     }
 
-    ulozitOdpovede(otazkaElement) {
-        const inputy = otazkaElement.querySelectorAll("input");
-        const otazkaIndex = this.otazky.indexOf(otazkaElement);
+    skontrolovatOdpovede() {
+        for (const otazka of this.otazky) {
+            const odpovede = otazka.querySelectorAll("[data-odpoved]");
 
-        let odpovede = [];
-        for (let input of inputy) {
-            odpovede.push(input.value);
+            if (odpovede.length === 0) throw new Error("Otázka nemá žiadne elementy pre odpovede.");
+
+            for (const odpoved of odpovede) {
+                if (odpoved.dataset.spravna !== undefined) {
+                    odpoved.parentElement.style.backgroundColor = odpoved.checked ? "lightgreen" : "lightcoral";
+                } else if (odpoved.checked) {
+                    odpoved.parentElement.style.backgroundColor = "lightcoral";
+                } else {
+                    odpoved.parentElement.style.backgroundColor = "lightgreen";
+                }
+            }
         }
-
-        this.odpovede[otazkaIndex] = odpovede;
     }
 
-    istNaOtazku(cislo) {
+    istNaOtazku(otazkaCislo) {
         this.otazky[this.aktualnaOtazka].style.display = "none";
-        this.aktualnaOtazka = cislo;
+        this.aktualnaOtazka = otazkaCislo;
         this.otazky[this.aktualnaOtazka].style.display = "block";
     }
 
@@ -41,3 +46,11 @@ class Kviz {
         this.istNaOtazku(this.aktualnaOtazka - 1);
     }
 }
+
+window.onload = () => {
+    const kviz = new Kviz();
+
+    document.getElementById("skontrolovat").addEventListener("click", () => {
+        kviz.skontrolovatOdpovede();
+    });
+};
