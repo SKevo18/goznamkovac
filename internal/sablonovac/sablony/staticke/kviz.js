@@ -3,6 +3,31 @@ class Kviz {
         this.element = element;
         this.otazky = this._vsetkyOtazky();
         this.aktualnaOtazka = 0;
+
+        this.postup = document.getElementById("postup");
+        this.postup.max = this.otazky.length;
+        this.postupText = document.getElementById("postupText");
+
+        this.tlcSkontrolovatOdpovede = document.getElementById("skontrolovatOdpovede");
+        this.tlcDalsiaOtazka = document.getElementById("dalsiaOtazka");
+        this.tlcPredchadzajucaOtazka = document.getElementById("predchadzajucaOtazka");
+
+        this._nastavitUdalosti();
+        this.istNaOtazku(this.aktualnaOtazka);
+    }
+
+    _nastavitUdalosti() {
+        this.tlcSkontrolovatOdpovede.addEventListener("click", () => {
+            this.skontrolovatOdpovede();
+        });
+
+        this.tlcPredchadzajucaOtazka.addEventListener("click", () => {
+            this.predchadzajucaOtazka();
+        });
+
+        this.tlcDalsiaOtazka.addEventListener("click", () => {
+            this.dalsiaOtazka();
+        });
     }
 
     _vsetkyOtazky() {
@@ -32,10 +57,26 @@ class Kviz {
         }
     }
 
-    istNaOtazku(otazkaCislo) {
+    istNaOtazku(indexOtazky) {
         this.otazky[this.aktualnaOtazka].style.display = "none";
-        this.aktualnaOtazka = otazkaCislo;
+
+        this.aktualnaOtazka = indexOtazky;
         this.otazky[this.aktualnaOtazka].style.display = "block";
+
+        this.postupText.innerText = `${this.aktualnaOtazka + 1} / ${this.otazky.length}`;
+        this.postup.value = this.aktualnaOtazka + 1;
+
+        if (this.aktualnaOtazka === 0) {
+            this.tlcPredchadzajucaOtazka.style.display = "none";
+        } else {
+            this.tlcPredchadzajucaOtazka.style.display = "inline";
+        }
+
+        if (this.aktualnaOtazka === this.otazky.length - 1) {
+            this.tlcDalsiaOtazka.style.display = "none";
+        } else {
+            this.tlcDalsiaOtazka.style.display = "inline";
+        }
     }
 
     dalsiaOtazka() {
@@ -49,8 +90,4 @@ class Kviz {
 
 window.onload = () => {
     const kviz = new Kviz();
-
-    document.getElementById("skontrolovat").addEventListener("click", () => {
-        kviz.skontrolovatOdpovede();
-    });
 };
