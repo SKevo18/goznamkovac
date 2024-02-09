@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+nazov: Kombinatorické funkcie
+otazky:
+  - otazka: |
+      Koľko je $C(5, 3)$?
+    odpovede:
+      - typ: input
+        spravna: "10"
+        atributy:
+          placeholder: Napíšte číslo

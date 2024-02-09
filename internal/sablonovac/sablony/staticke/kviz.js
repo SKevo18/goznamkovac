@@ -40,21 +40,41 @@ class Kviz {
     }
 
     skontrolovatOdpovede() {
+        let odpovedeData = {"spravne": [], "nespravne": []};
+
         for (const otazka of this.otazky) {
             const odpovede = otazka.querySelectorAll("[data-odpoved]");
-
             if (odpovede.length === 0) throw new Error("Otázka nemá žiadne elementy pre odpovede.");
 
             for (const odpoved of odpovede) {
-                if (odpoved.dataset.spravna !== undefined) {
-                    odpoved.parentElement.style.backgroundColor = odpoved.checked ? "lightgreen" : "lightcoral";
-                } else if (odpoved.checked) {
-                    odpoved.parentElement.style.backgroundColor = "lightcoral";
+                let spravnaOdpoved = odpoved.dataset.spravna;
+
+                let jeSpravna = false;
+                if (odpoved.type === "text") {
+                    let odpovedHodnota = odpoved.value.trim().toLowerCase();
+                    jeSpravna = odpovedHodnota === spravnaOdpoved;
+                } else if (["checkbox", "radio"].includes(odpoved.type)) {
+                    if (odpoved.checked) {
+                        jeSpravna = spravnaOdpoved !== undefined && ["true", ""].includes(spravnaOdpoved);
+                    } else {
+                        jeSpravna = spravnaOdpoved === undefined || spravnaOdpoved === "false";
+                    }
                 } else {
+                    throw new Error("Nepodporovaný typ poľa.");
+                }
+
+
+                if (jeSpravna) {
                     odpoved.parentElement.style.backgroundColor = "lightgreen";
+                    odpovedeData.spravne.push(odpoved);
+                } else {
+                    odpoved.parentElement.style.backgroundColor = "lightcoral";
+                    odpovedeData.nespravne.push(odpoved);
                 }
             }
         }
+
+        return odpovedeData;
     }
 
     istNaOtazku(indexOtazky) {

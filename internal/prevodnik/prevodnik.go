@@ -68,6 +68,7 @@ type Poznamky struct {
 	MarkdownCesta string
 
 	PrilozeneSubory []string
+	ObsahujeKviz    bool
 	DatumUpravy     string
 }
 
@@ -101,6 +102,26 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 	return html, nil
 }
 
+func najstPrilozeneSubory(rootCesta string) ([]string, error) {
+	prilozene_subory, chyba := filepath.Glob(rootCesta + "/*")
+	if chyba != nil {
+		return nil, chyba
+	}
+
+	for i, subor := range prilozene_subory {
+		preskocitSubory := []string{"index.md", "kviz.yaml"}
+
+		for _, preskocit := range preskocitSubory {
+			if filepath.Base(subor) == preskocit {
+				prilozene_subory = append(prilozene_subory[:i], prilozene_subory[i+1:]...)
+				break
+			}
+		}
+	}
+
+	return prilozene_subory, nil
+}
+
 // Nájde všetky Markdown súbory pre poznámky (`index.md`) v zadanom priečinku, rekurzívne
 // (každý priečinok s poznámkami musí mať súbor `index.md` aby boli poznámky platné).
 func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
@@ -117,15 +138,21 @@ func najstMarkdownPoznamky(poznamkyCesta string) ([]Poznamky, error) {
 
 		if filepath.Base(cesta) == "index.md" {
 			root := filepath.Dir(cesta)
-			prilozene_subory, chyba := filepath.Glob(root + "/*")
+			prilozene_subory, chyba := najstPrilozeneSubory(root)
 			if chyba != nil {
 				return chyba
+			}
+
+			obsahujeKviz := false
+			if _, chyba := os.Stat(root + "/kviz.yaml"); chyba == nil {
+				obsahujeKviz = true
 			}
 
 			markdownPoznamky = append(markdownPoznamky, Poznamky{
 				Nazov:           filepath.Base(root),
 				MarkdownCesta:   cesta,
-				PrilozeneSubory: prilozene_subory[1:],
+				PrilozeneSubory: prilozene_subory,
+				ObsahujeKviz:    obsahujeKviz,
 				DatumUpravy:     info.ModTime().Format("2006-01-02 15:04:05"),
 			})
 		}
@@ -158,6 +185,29 @@ func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Po
 
 		if chyba := os.WriteFile(htmlCesta, html, 0o644); chyba != nil {
 			return nil, chyba
+		}
+
+		// Kvíz
+		if poznamky.ObsahujeKviz {
+			kvizYaml, err := os.ReadFile(filepath.Dir(poznamky.MarkdownCesta) + "/kviz.yaml")
+			if err != nil {
+				return nil, err
+			}
+
+			kviz, chyba := nacitatKviz(kvizYaml)
+			if chyba != nil {
+				return nil, chyba
+			}
+
+			html, chyba := vykreslitKviz(kviz)
+			if chyba != nil {
+				return nil, chyba
+			}
+
+			kvizCesta := vystupnaCesta + "/" + filepath.Dir(poznamky.VystupnaCesta()) + "/kviz.html"
+			if chyba := os.WriteFile(kvizCesta, html, 0o644); chyba != nil {
+				return nil, chyba
+			}
 		}
 	}
 
