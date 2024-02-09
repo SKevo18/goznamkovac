@@ -16,10 +16,10 @@
     <div>
         {% for otazka in kviz.otazky %}
         <section data-otazka>
-            {{ otazka.html|safe }}
+            {{ otazka.Html()|safe }}
 
-            {% for vstup in otazka.vstupy %}
-            {{ vstup.html|safe }}
+            {% for odpoved in otazka.odpovede %}
+            {{ odpoved.Html()|safe }}
             {% endfor %}
         </section>
         {% endfor %}

@@ -26,7 +26,7 @@ var (
 )
 
 // Konvertuje poznámky z Markdown súboru do HTML
-func MarkdownNaHTML(markdownPoznamky []byte) ([]byte, error) {
+func MarkdownNaHtml(markdownPoznamky []byte) ([]byte, error) {
 	prevodnik := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
@@ -84,7 +84,7 @@ func (poznamky Poznamky) KonvertovatPoznamky() ([]byte, error) {
 		return nil, chyba
 	}
 
-	htmlPoznamky, chyba := MarkdownNaHTML(markdownPoznamky)
+	htmlPoznamky, chyba := MarkdownNaHtml(markdownPoznamky)
 	if chyba != nil {
 		return nil, chyba
 	}
@@ -199,7 +199,7 @@ func KonvertovatVsetkyPoznamky(poznamkyCesta string, vystupnaCesta string) ([]Po
 				return nil, chyba
 			}
 
-			html, chyba := vykreslitKviz(kviz)
+			html, chyba := kviz.Vykreslit()
 			if chyba != nil {
 				return nil, chyba
 			}
