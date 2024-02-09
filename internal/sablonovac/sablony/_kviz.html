@@ -14,64 +14,15 @@
     </div>
 
     <div>
-        {% for otazka in kviz.otazky %}
-        <section data-otazka>
-            {{ otazka.Html()|safe }}
+        {% for Otazka in kviz.Otazky %}
+            <section data-otazka>
+                {{ Otazka.Html()|safe }}
 
-            {% for odpoved in otazka.odpovede %}
-            {{ odpoved.Html()|safe }}
-            {% endfor %}
-        </section>
+                {% for Odpoved in otazka.Odpovede %}
+                    {{ Odpoved.Html()|safe }}
+                {% endfor %}
+            </section>
         {% endfor %}
-        <section data-otazka>
-            <p class="my-4">Vyber ovocie:</p>
-
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved data-spravna type="checkbox" />&nbsp;Jablko</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved data-spravna type="checkbox" />&nbsp;Hruška</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved type="checkbox" />&nbsp;Mrkva</label>
-            </div>
-        </section>
-
-        <section data-otazka>
-            <p class="my-4">Koľko ľudí sa nachádza na Slovensku?</p>
-
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved data-spravna type="radio" name="r1" />&nbsp;5,5 milióna</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved type="radio" name="r1" />&nbsp;3 milióny</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved type="radio" name="r1" />&nbsp;10 miliónov</label>
-            </div>
-        </section>
-
-        <section data-otazka>
-            <p class="my-4">Vyber zeleninu:</p>
-
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved data-spravna type="checkbox" />&nbsp;Mrkva</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved data-spravna type="checkbox" />&nbsp;Cibuľa</label>
-            </div>
-            <div class="m-4">
-                <label class="p-2"><input data-odpoved type="checkbox" />&nbsp;Hruška</label>
-            </div>
-        </section>
-
-        <section data-otazka>
-            <p class="my-4">Aké je hlavné mesto Slovenska?</p>
-            <div>
-                <input placeholder="Sem vpíš svoju odpoveď..." class="px-2 py-1 m-4 text-sm border-2 border-gray-500 rounded-lg" type="text" data-odpoved data-spravna="bratislava" />
-            </div>
-
-        </section>
     </div>
 
     <div class="flex flex-row justify-between gap-2">

@@ -113,8 +113,10 @@ func najstPrilozeneSubory(rootCesta string) ([]string, error) {
 
 		for _, preskocit := range preskocitSubory {
 			if filepath.Base(subor) == preskocit {
-				prilozene_subory = append(prilozene_subory[:i], prilozene_subory[i+1:]...)
-				break
+				if len(prilozene_subory) > 1 {
+					prilozene_subory = append(prilozene_subory[:i], prilozene_subory[i+1:]...)
+					break
+				}
 			}
 		}
 	}

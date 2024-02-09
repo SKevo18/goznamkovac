@@ -23,13 +23,13 @@ type Otazka struct {
 	Odpovede []Odpoved
 }
 
-func (otazka *Otazka) Html() (string, error) {
+func (otazka Otazka) Html() string {
 	html, err := MarkdownNaHtml([]byte(otazka.Otazka))
 	if err != nil {
-		return "", err
+		return err.Error()
 	}
 
-	return string(html), nil
+	return string(html)
 }
 
 // Odpoved je štruktúra reprezentujúca odpoveď na otázku
@@ -39,7 +39,7 @@ type Odpoved struct {
 	Atributy map[string]interface{}
 }
 
-func (odpoved *Odpoved) Html() string {
+func (odpoved Odpoved) Html() string {
 	atributy := ""
 	for atribut, hodnota := range odpoved.Atributy {
 		atributy += fmt.Sprintf(` %s="%s"`, atribut, hodnota)
@@ -52,6 +52,7 @@ func (kviz *Kviz) Vykreslit() ([]byte, error) {
 	html, err := sablonovac.VykreslitSablonu(kvizSablona, pongo2.Context{
 		"kviz": kviz,
 	})
+
 	if err != nil {
 		return nil, err
 	}
